@@ -4,12 +4,48 @@
 #include <GL/glut.h>
 #define TAMANHO_JANELA 500
 
-float size = 5.0;
+float size = 5.0, gX = 0, gY = 0;
+int leftButtonIsPressed = 0;
 
 //Pontos de controle da Spline
 GLfloat ctrlpoints[4][3] = {
-        { 4.0, 4.0, 0.0}, { 2.0, -4.0, 0.0}, 
-        {2.0, 4.0, 0.0}, {-4.0,-4.0, 0.0}};
+        { 4.0, 4.0, 0.0}, // direita superior 
+        { 2.0, -4.0, 0.0}, // direita inferior
+        {2.0, 4.0, 0.0},  // esquerda superior
+        {-4.0,-4.0, 0.0}}; // esquerda inferior
+
+void replaceCtrlPoints(){
+   if(leftButtonIsPressed == 1)
+   for(int i = 0; i < 4; i++){
+      ctrlpoints[i][1] += gY;
+      ctrlpoints[i][0] += gX;
+   }
+
+   glutPostRedisplay();
+}
+
+
+void move(int x, int y){
+   if(leftButtonIsPressed){
+      y = TAMANHO_JANELA - y;
+      gX = (float) x/TAMANHO_JANELA;
+      gY = (float) y/TAMANHO_JANELA;
+      //printf("x: %d  y: %d\n", x, y);
+      glutPostRedisplay();
+   }
+}
+
+void mouse(int button, int state, int x, int y){
+   if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+      //printf("clicou\n");
+      leftButtonIsPressed = 1;
+   }
+   if(button == GLUT_LEFT_BUTTON && state == GLUT_UP){
+     // printf("soltou\n");
+      leftButtonIsPressed = 0;
+   }
+   
+}
 
 void init(void){
    glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -82,6 +118,9 @@ int main(int argc, char** argv)
    init ();
    glutDisplayFunc(display);
    glutReshapeFunc(reshape);
+
+   glutMouseFunc(mouse);
+
    glutMainLoop();
    return 0;
 }
